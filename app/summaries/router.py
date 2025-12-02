@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
+
+from fastapi_limiter.depends import RateLimiter
 
 from app.summaries.schemas import SummaryPublic, SummaryPost, SummaryUpdate, SummaryDelete
 from app.summaries.summarize import summarize
@@ -9,6 +11,7 @@ from app.redis import set_storage
 router = APIRouter(prefix='/summary', tags=['Summaries'])
 
 storage = set_storage(SummaryPublic)
+
 
 @router.get('/text/{id}')
 async def get_summary(id: int) -> SummaryPublic:
@@ -24,7 +27,7 @@ async def get_summary(id: int) -> SummaryPublic:
     raise HTTPException(status.HTTP_404_NOT_FOUND)
 
 
-@router.post('/text')
+@router.post('/text', dependencies=[Depends(RateLimiter(times=1, seconds=1))])
 async def make_summary(request_body: SummaryPost) -> SummaryPublic:
     instance = await SummaryDA.get(**request_body.model_dump())
     if instance:
@@ -37,7 +40,7 @@ async def make_summary(request_body: SummaryPost) -> SummaryPublic:
     return new_instance
 
 
-@router.put('/text')
+@router.put('/text', dependencies=[Depends(RateLimiter(times=1, seconds=1))])
 async def update_summary(request_body: SummaryUpdate) -> SummaryUpdate:
     filter_by = {'id': request_body.id}
     is_updated = await SummaryDA.update(
@@ -51,7 +54,7 @@ async def update_summary(request_body: SummaryUpdate) -> SummaryUpdate:
     raise HTTPException(status.HTTP_304_NOT_MODIFIED)
 
 
-@router.delete('/text')
+@router.delete('/text', dependencies=[Depends(RateLimiter(times=1, seconds=1))])
 async def delete_summary(request_body: SummaryDelete) -> dict:
     is_deleted = await SummaryDA.delete(**request_body.to_dict())
     if is_deleted:

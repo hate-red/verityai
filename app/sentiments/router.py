@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
+
+from fastapi_limiter.depends import RateLimiter
 
 from app.sentiments.schemas import SentimentPublic, SentimentPost, SentimentPut, SentimentDelete
 from app.sentiments.analyzer import SentimentAnalyzer
@@ -29,7 +31,7 @@ async def get_sentiment(id: int) -> SentimentPublic:
     raise HTTPException(status.HTTP_404_NOT_FOUND)
 
 
-@router.post('/text')
+@router.post('/text', dependencies=[Depends(RateLimiter(times=1, seconds=1))])
 async def analyze_sentiment(request_body: SentimentPost) -> SentimentPublic:
     """
     A function for analyzing sentiment of a given text 
@@ -52,7 +54,7 @@ async def analyze_sentiment(request_body: SentimentPost) -> SentimentPublic:
     return instance
 
 
-@router.put('/text')
+@router.put('/text', dependencies=[Depends(RateLimiter(times=1, seconds=1))])
 async def update_sentiment(request_body: SentimentPut) -> SentimentPublic:
     """
     Processes updated text, 
@@ -77,7 +79,7 @@ async def update_sentiment(request_body: SentimentPut) -> SentimentPublic:
     raise HTTPException(status.HTTP_304_NOT_MODIFIED)
 
 
-@router.delete('/text')
+@router.delete('/text', dependencies=[Depends(RateLimiter(times=1, seconds=1))])
 async def delete_sentiment(request_body: SentimentDelete) -> dict:
     """
     Deletes sentiment analysis by a given id or a source_text

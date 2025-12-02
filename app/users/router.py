@@ -1,5 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, Response, Depends
 
+from fastapi_limiter.depends import RateLimiter
+
 from app.users.data_access import UserDA
 from app.users.schemas import UserPublic, UserFilter, UserSignUp, UserSignIn, UserUpdate, UserDelete
 from app.users.auth import get_password_hash, create_access_token, authenticate_user
@@ -9,7 +11,11 @@ from app.users.dependencies import get_current_user
 router = APIRouter(prefix='/user', tags=['Users'])
 
 
-@router.post('/signup', summary='Registers user')
+@router.post(
+    '/signup', 
+    summary='Registers user', 
+    dependencies=[Depends(RateLimiter(times=1, seconds=1))],
+)
 async def signup(user_info: UserSignUp) -> dict:
     is_username_exists = await UserDA.get(username=user_info.username)
     if is_username_exists:
@@ -32,7 +38,11 @@ async def signup(user_info: UserSignUp) -> dict:
     return {'message': 'User was successfully signed up'}
 
 
-@router.post('/signin', summary='Logs user in')
+@router.post(
+    '/signin', 
+    summary='Logs user in',
+    dependencies=[Depends(RateLimiter(times=1, seconds=1))],
+)
 async def signin(response: Response, user_info: UserSignIn) -> dict:
     user = await authenticate_user(email=user_info.email, password=user_info.password)
 
@@ -44,13 +54,21 @@ async def signin(response: Response, user_info: UserSignIn) -> dict:
     return {'access_token': access_token, 'refresh_token': None}
 
 
-@router.post('/logout', summary='Logs user out')
+@router.post(
+    '/logout', 
+    summary='Logs user out',
+    dependencies=[Depends(RateLimiter(times=1, seconds=1))],
+)
 async def logout(response: Response) -> dict:
     response.delete_cookie(key='user_access_token')
     return {'message': 'User was logged out'}
 
 
-@router.post('/find', summary='Finds users')
+@router.post(
+    '/find', 
+    summary='Finds users',
+    dependencies=[Depends(RateLimiter(times=1, seconds=1))],
+)
 async def find_users(filter_by: UserFilter) -> list[UserPublic]:
     users = await UserDA.filter(**filter_by.to_dict())
 
@@ -60,12 +78,20 @@ async def find_users(filter_by: UserFilter) -> list[UserPublic]:
     return users # type: ignore
 
 
-@router.get('/', summary='Gets user profile')
+@router.get(
+    '/', 
+    summary='Gets user profile',
+    dependencies=[Depends(RateLimiter(times=1, seconds=1))],
+)
 async def get_user(user: UserPublic = Depends(get_current_user)) -> UserPublic:
     return user
 
 
-@router.put('/', summary='Changes user information')
+@router.put(
+    '/', 
+    summary='Changes user information',
+    dependencies=[Depends(RateLimiter(times=1, seconds=1))],
+)
 async def update_user(user_id: int, user_info: UserUpdate) -> UserPublic:
     check = await UserDA.update(filter_by={'id': user_id}, **user_info.to_dict())
 
@@ -76,7 +102,11 @@ async def update_user(user_id: int, user_info: UserUpdate) -> UserPublic:
     return user  # type: ignore
 
 
-@router.delete('/', summary='Deletes user')
+@router.delete(
+    '/', 
+    summary='Deletes user',
+    dependencies=[Depends(RateLimiter(times=1, seconds=1))],
+)
 async def delete_user(user: UserDelete) -> dict:
     check = await UserDA.delete(**user.to_dict())
 
