@@ -11,18 +11,21 @@ from app.sentiments.router import router as sentiment_router
 from app.summaries.router import router as summaries_router
 from app.users.router import router as users_router
 from app.redis import r
+from app.logs import logger
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await FastAPILimiter.init(r)
+    logger.info('Starting server...')
 
     yield
 
-    print('shutting down...')
+    logger.info('Shutting down server...')
 
 
 app = FastAPI(lifespan=lifespan)
+
 
 
 @app.get('/', tags=['Home'])
