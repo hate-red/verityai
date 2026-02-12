@@ -28,7 +28,7 @@ class SentimentAnalyzer:
     def estimate_sentiment(self, raw_text: str | bytes) -> list[float]:
         """
         Core function that does sentiment analysis.
-        It processes raw_text to a list of floats that 
+        It processes `raw_text` to a list of floats that 
         respresent sentiments: one sentence - one sentiment
         """
 
@@ -84,6 +84,3 @@ class GraphCreator:
 
         if show:
             plt.show()
-
-if __name__ == '__main__':
-    ...

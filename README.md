@@ -14,13 +14,12 @@ DB_HOST=localhost
 DB_NAME=postgres
 DB_USER=postgres
 DB_PASSWORD=my_super_passowrd
-DB_PORT=1234
+DB_PORT=5432
 SECRET_KEY=gV64m9aIzFG4qpgVphvQbPQrtAO0nM-7YwwOvu0XPt5KJOjAy4AfgLkqJXYEt
 ALGORITHM=HS256
 ```
 
 In `docker-compose.yml` file change this fields: 
-- container_name
 - POSTGRES_USER
 - POSTGRES_PASSWORD
 - POSTGRES_DB
@@ -28,15 +27,24 @@ In `docker-compose.yml` file change this fields:
 
 accordingly to the values you filled in the `.env` file.
 
-Set up docker container for database
+Set up docker container for databases
 ```
 docker-compose up -d
 ```
 
-If you are using `uv` run these commands:
+For `pip`.
+
+```
+pip install -r requirements.txt
+```
+
+For `uv`
 
 ```
 uv sync
+```
+
+```
 source .venv/bin/activate
 alembic revision --autogenerate -m "Initial revision"
 alembic upgrade head
