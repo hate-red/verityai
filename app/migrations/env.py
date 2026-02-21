@@ -5,19 +5,16 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
-import sys
-from os.path import dirname, abspath
 
-sys.path.insert(0, dirname(dirname(abspath(__file__))))
-
-from database import DATABASE_URL, Base
-from users.models import User
-from sentiments.models import Sentiment
-from summaries.models import Summary
+from app.database import DATABASE_URL, Base
+from app.users.models import User
+from app.sentiments.models import Sentiment
+from app.summaries.models import Summary
 
 
 config = context.config
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
+
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
     

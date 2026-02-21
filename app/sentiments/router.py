@@ -44,10 +44,9 @@ async def analyze_sentiment(request_body: SentimentPost) -> SentimentPublic:
     # processing text if it was not analyzed before
     if not instance:
         sentiments = analyzer.estimate_sentiment(request_body.source_text)
-        sentiments_string = ' '.join(map(str, sentiments))
         
         # adding another filed to dict to create new database entry
-        values = request_body.model_dump() | {'sentiments': sentiments_string}
+        values = request_body.model_dump() | {'sentiments': sentiments}
         instance = await SentimentDA.create(**values)
     
     # otherwize return existing analysis result
@@ -63,11 +62,10 @@ async def update_sentiment(request_body: SentimentPut) -> SentimentPublic:
 
     filter_by = {'id': request_body.id}
     updated_sentiments = analyzer.estimate_sentiment(request_body.updated_text)
-    sentiments_string = ' '.join(str(sent) for sent in updated_sentiments)
 
     values = {
         'source_text': request_body.updated_text,
-        'sentiments': sentiments_string
+        'sentiments': updated_sentiments
     }
     is_updated = await SentimentDA.update(filter_by, **values)
     

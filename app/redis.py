@@ -1,8 +1,9 @@
 import redis.asyncio as redis
 from safir.redis import PydanticRedisStorage
+from app.config import settings
 
 
-r = redis.Redis()
+r = redis.Redis(port=settings.REDIS_PORT)
 
 def set_storage(datatype) -> PydanticRedisStorage:
     """

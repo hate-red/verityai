@@ -5,7 +5,8 @@ from app.database import Base
 
 class User(Base):
     __tablename__ = 'users'
-    extend_existing=True
+    __table_args__ = {'extend_existing': True}
+
     
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(unique=True)

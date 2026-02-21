@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, Float
+from sqlalchemy.dialects.postgresql import ARRAY
+
 from pydantic import ConfigDict
-from typing import Optional
 
 from app.database import Base
 from app.users.models import User
@@ -13,16 +14,14 @@ class Sentiment(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     
     # Can bu null if user is not logged in 
-    user_id: Mapped[Optional[int]] = mapped_column(ForeignKey('users.id'), nullable=True, default=None) # type: ignore
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     
     # TEXT field to store files contents, parsed html, plain text 
     source_text: Mapped[str]
     
-    # A string of floats like '0.2 -0.1 0.5 ..'
-    # It is then converted to a list of floats
-    sentiments: Mapped[str]
+    sentiments: Mapped[list[float]] = mapped_column(ARRAY(Float))
 
-    user: Mapped[User] = relationship('User') # type: ignore # noqa: F821
+    user: Mapped[User] = relationship('User')
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -36,6 +35,6 @@ class Sentiment(Base):
         }
 
     def __repr__(self) -> str:
-        return f'User ID: {self.user_id} | '\
-               f'Text: {self.source_text :10}...'\
+        return f'User ID: {self.user_id}\t'\
+               f'Text: {self.source_text :10}...\t'\
                f'Sentiments: {self.sentiments[0]}'

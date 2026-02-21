@@ -6,14 +6,17 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 ROOT_DIR = Path(__file__).parent.parent
 
 class Settings(BaseSettings):
-    # Postgres settings
-    DB_HOST: str
-    DB_PORT: int
-    DB_NAME: str
-    DB_USER: str
-    DB_PASSWORD: str
+    # Postgres
+    POSTGRES_HOST: str
+    POSTGRES_PORT: int
+    POSTGRES_NAME: str
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
 
-    # for passwords
+    # Redis
+    REDIS_PORT: int
+
+    # Encryption passwords
     SECRET_KEY: str
     ALGORITHM: str
 
@@ -27,8 +30,8 @@ settings = Settings() # type: ignore
 
 def get_db_url():
     return (
-        f'postgresql+asyncpg://{settings.DB_USER}:{settings.DB_PASSWORD}@'
-        f'{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}'
+        f'postgresql+asyncpg://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@'
+        f'{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_NAME}'
     )
 
 
