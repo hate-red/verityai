@@ -9,6 +9,9 @@ from app.users.models import User
 
 
 class Sentiment(Base):
+    """
+    Database model for results of sentiment analysis
+    """
     __tablename__ = 'sentiments'
 
     id: Mapped[int] = mapped_column(primary_key=True)

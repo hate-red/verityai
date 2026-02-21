@@ -4,8 +4,11 @@ from app.database import Base
 
 
 class User(Base):
+    """
+    Database model for storing users
+    """
     __tablename__ = 'users'
-    __table_args__ = {'extend_existing': True}
+    # __table_args__ = {'extend_existing': True}
 
     
     id: Mapped[int] = mapped_column(primary_key=True)

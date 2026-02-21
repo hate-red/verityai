@@ -5,12 +5,12 @@ from fastapi_limiter.depends import RateLimiter
 from app.summaries.schemas import SummaryPublic, SummaryPost, SummaryUpdate, SummaryDelete
 from app.summaries.summarize import summarize
 from app.summaries.data_access import SummaryDA
-from app.redis import set_storage
+from app.redis import get_storage
 
 
 router = APIRouter(prefix='/summary', tags=['Summaries'])
 
-storage = set_storage(SummaryPublic)
+storage = get_storage(SummaryPublic, prefix='summary')
 
 
 @router.get('/text/{id}')
@@ -35,9 +35,12 @@ async def make_summary(request_body: SummaryPost) -> SummaryPublic:
 
     summarized_text = summarize(request_body.source_text)
     values = request_body.model_dump() | {'summarized_text': summarized_text}    
-    new_instance = await SummaryDA.create(**values)
+
+    if request_body.user_id:
+        new_instance = await SummaryDA.create(**values)
+        return new_instance
     
-    return new_instance
+    return values # type: ignore
 
 
 @router.put('/text', dependencies=[Depends(RateLimiter(times=1, seconds=1))])

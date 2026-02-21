@@ -5,10 +5,11 @@ from app.config import settings
 
 r = redis.Redis(port=settings.REDIS_PORT)
 
-def set_storage(datatype) -> PydanticRedisStorage:
+
+def get_storage(pydantic_model, prefix = "") -> PydanticRedisStorage:
     """
-    provides storage for saving pydantic models into redis
-    datatype pameter is pydantic model class 
+    Provides storage for saving pydantic models into redis.
+    With prefix key in redis looks like this: prefixMyKey.
     """
-    return PydanticRedisStorage(datatype=datatype, redis=r)
-     
+    return PydanticRedisStorage(datatype=pydantic_model, redis=r, key_prefix=prefix)
+    

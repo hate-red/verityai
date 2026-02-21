@@ -8,6 +8,9 @@ from app.users.models import User
 
 
 class Summary(Base):
+    """
+    Database model for results of summarization
+    """
     __tablename__ = 'summaries'
     
     id: Mapped[int] = mapped_column(primary_key=True)

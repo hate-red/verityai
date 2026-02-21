@@ -31,7 +31,6 @@ class SentimentAnalyzer:
         It processes `raw_text` to a list of floats that 
         respresent sentiments: one sentence - one sentiment
         """
-
         sentences = preprocess_text(raw_text)
         sentiment_result = []
 
