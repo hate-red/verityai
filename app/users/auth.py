@@ -20,12 +20,12 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 def create_access_token(data: dict) -> str:
-    to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(days=30)
-    to_encode.update({'exp': expire})
+    to_encode = data | {'exp': expire}
     auth_data = get_auth_data()
+    
     encode_jwt = jwt.encode(
-        to_encode, 
+        to_encode,
         auth_data['secret_key'], 
         algorithm=auth_data['algorithm']
     )

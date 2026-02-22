@@ -16,7 +16,6 @@ class Sentiment(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     
-    # Can bu null if user is not logged in 
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     
     # TEXT field to store files contents, parsed html, plain text 

@@ -29,18 +29,18 @@ router = APIRouter(prefix='/user', tags=['Users'])
     summary='Registers user', 
     dependencies=[Depends(RateLimiter(times=1, seconds=1))],
 )
-async def signup(user_info: UserSignUp) -> dict:
-    is_username_exists = await UserDA.get(username=user_info.username)
-    if is_username_exists:
-        logger.debug('Failed attemp to sign up (username exists)', username=user_info.username)
+async def signup(user_info: UserSignUp) -> UserPublic:
+    username_exists = await UserDA.get(username=user_info.username)
+    if username_exists:
+        logger.debug('Failed attempt to sign up (username exists)', username=user_info.username)
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail='User with this username already exists'
         )
 
-    is_email_exists = await UserDA.get(email=user_info.email)
-    if is_email_exists:
-        logger.debug('Failed attemp to sign up (email exists)', email=user_info.email)
+    email_exists = await UserDA.get(email=user_info.email)
+    if email_exists:
+        logger.debug('Failed attempt to sign up (email exists)', email=user_info.email)
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail='User with this email already exists'
@@ -48,10 +48,11 @@ async def signup(user_info: UserSignUp) -> dict:
 
     user_dict = user_info.model_dump()
     user_dict['password'] = get_password_hash(user_info.password)
-    _ = await UserDA.create(**user_dict)
+    
+    user = await UserDA.create(**user_dict)
 
     logger.info('User was signed up')
-    return {'message': 'User was successfully signed up'}
+    return user
 
 
 @router.post(
@@ -137,7 +138,10 @@ async def delete_user(user: UserDelete) -> dict:
 
     if not check:
         logger.debug('Failed to delete user', **user.to_dict())
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Error when deleting user')
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail='Error when deleting user'
+        )
 
     logger.debug('User was deleted', **user.to_dict())
     return {'message': 'User was successfully deleted'}

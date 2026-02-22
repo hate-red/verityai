@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class SummaryPublic(BaseModel):
     """
-    Response schema for all summary endpoints
+    Response schema
     """
     id: int | None = None
     user_id: int | None = None
