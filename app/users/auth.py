@@ -23,7 +23,7 @@ def create_access_token(data: dict) -> str:
     expire = datetime.now(timezone.utc) + timedelta(days=30)
     to_encode = data | {'exp': expire}
     auth_data = get_auth_data()
-    
+
     encode_jwt = jwt.encode(
         to_encode,
         auth_data['secret_key'], 

@@ -20,20 +20,18 @@ def get_token(request: Request):
 async def get_current_user(token: str = Depends(get_token)):
     try:
         auth_data = get_auth_data()
+
+        # by defalut checks that `sub` is present and token is not expired
         payload = jwt.decode(token, auth_data['secret_key'], algorithms=auth_data['algorithm'])
     except JWTError:
-        logger.debug('Failed to auth user', token=token)
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail='Invalid token')
+        logger.debug('Invalid token or is has expired', token=token)
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail='Invalid token or is has expired')
 
-    user_id = int(payload.get('sub')) # type: ignore
-    if not user_id:
-        logger.debug('User ID was not founed', payload=payload)
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail='User ID not found')
-
+    user_id = int(payload['sub'])
     user = await UserDA.get(id=user_id)
     if not user:
         logger.debug('User not found', user_id=user_id)
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail='User not found')
 
-    logger.info('User was found', user_id=user_id)
+    logger.debug('User was found', user_id=user_id)
     return user

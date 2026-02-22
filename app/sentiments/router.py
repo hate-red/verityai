@@ -5,6 +5,9 @@ from fastapi_limiter.depends import RateLimiter
 from app.sentiments.schemas import SentimentPublic, SentimentPost, SentimentUpdate, SentimentDelete
 from app.sentiments.analyzer import SentimentAnalyzer
 from app.sentiments.data_access import SentimentDA
+
+# from app.users.dependencies import get_current_user
+
 from app.redis import get_storage
 
 

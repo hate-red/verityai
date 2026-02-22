@@ -8,14 +8,18 @@ class UserPublic(BaseModel):
     username: str
     email: EmailStr
 
+    is_admin: bool
+
 
 class UserFilter(BaseModel):
+    id: int | None = None
     username: str | None = None
     email: EmailStr | None = None
 
 
     def to_dict(self):
         data = {
+            'id': self.id,
             'username': self.username, 
             'email': self.email,
         }
