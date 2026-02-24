@@ -24,6 +24,17 @@ from app.logs import logger
 router = APIRouter(prefix='/user', tags=['Users'])
 
 
+@router.get(
+    '/', 
+    summary='Gets user profile',
+    dependencies=[Depends(RateLimiter(times=1, seconds=1))],
+)
+async def get_user(user: UserPublic = Depends(get_current_user)) -> UserPublic:
+    if user:
+        return user
+
+    raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail='You are not authorized')
+
 @router.post(
     '/signup', 
     summary='Registers user', 
@@ -99,15 +110,6 @@ async def find_users(filter_by: UserFilter) -> list[UserPublic]:
 
     logger.debug('Users were found', **filter_by.to_dict())
     return users # type: ignore
-
-
-@router.get(
-    '/', 
-    summary='Gets user profile',
-    dependencies=[Depends(RateLimiter(times=1, seconds=1))],
-)
-async def get_user(user: UserPublic = Depends(get_current_user)) -> UserPublic:
-    return user
 
 
 @router.put(

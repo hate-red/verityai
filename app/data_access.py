@@ -13,7 +13,7 @@ class BaseDA:
         async with async_session_maker() as session:
             query = select(cls.model).filter_by(**filter_by) # type: ignore
             result = await session.execute(query)
-            instance = result.scalars().first()
+            instance = result.scalar_one_or_none()
         
         return instance
     

@@ -8,7 +8,11 @@ class UserPublic(BaseModel):
     username: str
     email: EmailStr
 
+    # roles
     is_admin: bool
+
+    def __repr__(self):
+        return f'username: {self.username}, email: {self.email}'
 
 
 class UserFilter(BaseModel):

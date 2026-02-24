@@ -1,23 +1,27 @@
 from fastapi import Request, HTTPException, status, Depends
 from jose import jwt, JWTError
 
-from app.config import get_auth_data
 from app.users.data_access import UserDA
+from app.users.schemas import UserPublic
+
 from app.logs import logger
+from app.config import get_auth_data
 
 
-
-def get_token(request: Request):
+def get_token(request: Request) -> str | None:
     token = request.cookies.get('user_access_token')
 
     if not token:
         logger.debug('Failed to get user access token', request=request.cookies)
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail='Token not found')
+        return None
 
     return token
 
 
-async def get_current_user(token: str = Depends(get_token)):
+async def get_current_user(token: str = Depends(get_token)) -> UserPublic | None:
+    if not token:
+        return None
+
     try:
         auth_data = get_auth_data()
 
@@ -30,7 +34,7 @@ async def get_current_user(token: str = Depends(get_token)):
     user_id = int(payload['sub'])
     user = await UserDA.get(id=user_id)
     if not user:
-        logger.debug('User not found', user_id=user_id)
+        logger.debug('User not found after decoding token', user_id=user_id)
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail='User not found')
 
     logger.debug('User was found', user_id=user_id)
